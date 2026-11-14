@@ -1,0 +1,51 @@
+<?jelly escape-by-default='true'?>
+<j:jelly xmlns:j="jelly:core" xmlns:l="/lib/layout" xmlns:f="/lib/form" xmlns:i="jelly:fmt">
+    <l:layout title="${it.displayName}" type="one-column" permission="${app.ADMINISTER}">
+        <l:main-panel>
+            <l:app-bar title="${it.displayName}"/>
+            <p>${%intro}</p>
+            <j:set var="registrations" value="${it.registrations}"/>
+            <j:choose>
+                <j:when test="${registrations.isEmpty()}">
+                    <p>${%No device is registered.}</p>
+                </j:when>
+                <j:otherwise>
+                    <table class="jenkins-table sortable">
+                        <thead>
+                            <tr>
+                                <th>${%User}</th>
+                                <th>${%Device}</th>
+                                <th>${%Environment}</th>
+                                <th>${%Status}</th>
+                                <th>${%Subscriptions}</th>
+                                <th>${%Updated}</th>
+                                <th class="jenkins-table__cell--tight"/>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <j:forEach var="registration" items="${registrations}">
+                                <tr>
+                                    <td>${registration.userId}</td>
+                                    <td><code>${registration.deviceTokenSuffix}</code></td>
+                                    <td>${registration.environment}</td>
+                                    <td>${registration.status.wireName()}</td>
+                                    <td>${registration.subscriptions.size()}</td>
+                                    <td data="${registration.updatedAt}">
+                                        <i:formatDate value="${registration.updatedAtDate}" type="both" dateStyle="medium" timeStyle="short"/>
+                                    </td>
+                                    <td class="jenkins-table__cell--tight">
+                                        <form method="post" action="revoke">
+                                            <input type="hidden" name="userId" value="${registration.userId}"/>
+                                            <input type="hidden" name="id" value="${registration.id}"/>
+                                            <button type="submit" class="jenkins-button jenkins-button--tertiary jenkins-!-destructive-color">${%Revoke}</button>
+                                        </form>
+                                    </td>
+                                </tr>
+                            </j:forEach>
+                        </tbody>
+                    </table>
+                </j:otherwise>
+            </j:choose>
+        </l:main-panel>
+    </l:layout>
+</j:jelly>

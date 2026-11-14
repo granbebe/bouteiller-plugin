@@ -1,0 +1,18 @@
+<?jelly escape-by-default='true'?>
+<j:jelly xmlns:j="jelly:core" xmlns:f="/lib/form">
+    <f:section title="${%Bouteiller}">
+        <f:entry field="pushEnabled">
+            <f:checkbox title="${%Send push notifications to the Bouteiller app}" default="true"/>
+        </f:entry>
+        <f:advanced>
+            <f:entry title="${%Relay URL}" field="relayUrl">
+                <f:textbox/>
+            </f:entry>
+            <f:entry field="useProxy">
+                <f:checkbox title="${%Reach the relay through the HTTP proxy of Jenkins}" default="true"/>
+            </f:entry>
+            <f:validateButton title="${%Test the relay}" progress="${%Testing…}" method="testRelay"
+                              with="relayUrl,useProxy"/>
+        </f:advanced>
+    </f:section>
+</j:jelly>

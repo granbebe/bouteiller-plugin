@@ -63,6 +63,8 @@ public final class BouteillerConfiguration extends GlobalConfiguration {
         save();
     }
 
+    // Only checks the syntax of the value given: no side effect, no network access, nothing private returned.
+    @SuppressWarnings({"lgtm[jenkins/no-permission-check]", "lgtm[jenkins/csrf]"})
     public FormValidation doCheckRelayUrl(@QueryParameter String value) {
         if (value == null || value.isBlank()) {
             return FormValidation.ok();

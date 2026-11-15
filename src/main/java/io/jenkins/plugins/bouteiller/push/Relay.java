@@ -8,6 +8,8 @@ public interface Relay {
      * @param payload  the encrypted event, {@code base64(nonce || ciphertext || tag)}
      * @param threadId grouping identifier, hashed (cf. {@link PushEvent#threadId})
      */
+    // In memory only, never serialized: the tokens are stored encrypted by RegistrationStore.
+    @SuppressWarnings("lgtm[jenkins/plaintext-storage]")
     record Request(String deviceToken, String environment, String accessToken, String payload, String threadId) {
         @Override
         public String toString() {

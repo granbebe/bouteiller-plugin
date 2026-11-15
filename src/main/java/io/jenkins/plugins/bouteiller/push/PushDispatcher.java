@@ -54,6 +54,8 @@ public final class PushDispatcher {
     /** The relay client of the current configuration, kept to reuse its connections. */
     private Relay relay;
 
+    /** The relay URL and proxy choice that {@link #relay} was built for: a cache key, not a secret. */
+    @SuppressWarnings("lgtm[jenkins/plaintext-storage]")
     private String relayKey;
 
     public PushDispatcher() {

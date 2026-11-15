@@ -20,6 +20,8 @@ import org.kohsuke.stapler.StaplerResponse2;
 @StaplerAccessibleType
 public final class ApiV1 {
     /** {@code GET /info}: version of the plugin and available features. */
+    // Not private (the version and features of the plugin), no side effect, GET only.
+    @SuppressWarnings({"lgtm[jenkins/no-permission-check]", "lgtm[jenkins/csrf]"})
     public void doInfo(StaplerRequest2 request, StaplerResponse2 response) throws IOException {
         if (!request.getMethod().equals("GET")) {
             JsonResponses.methodNotAllowed(response, "GET");
@@ -46,6 +48,9 @@ public final class ApiV1 {
      * the registrations of the current user. Routed here rather than through Stapler objects so that no URL needs a
      * trailing slash.
      */
+    // Each registration is only visible to the Jenkins user who created it (RegistrationResource). Changes use PUT and
+    // DELETE, which a browser cannot send cross-origin without a CORS preflight, and POST, checked by the crumb filter.
+    @SuppressWarnings({"lgtm[jenkins/no-permission-check]", "lgtm[jenkins/csrf]"})
     public void doRegistrations(StaplerRequest2 request, StaplerResponse2 response) throws IOException {
         String[] segments = request.getRestOfPath().replaceFirst("^/", "").split("/", -1);
         if (segments.length == 0 || segments.length > 2 || !Registration.ID.matcher(segments[0]).matches()) {
@@ -63,6 +68,8 @@ public final class ApiV1 {
     }
 
     /** {@code /job/{path}/{n}/stages} and {@code /job/{path}/{n}/inputs} of Pipeline builds. */
+    // Jobs are looked up with getItemByFullName, which requires Item/Read; read only, GET only.
+    @SuppressWarnings({"lgtm[jenkins/no-permission-check]", "lgtm[jenkins/csrf]"})
     public void doJob(StaplerRequest2 request, StaplerResponse2 response) throws IOException {
         BuildResource.serve(request, response);
     }

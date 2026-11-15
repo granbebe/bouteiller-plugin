@@ -9,8 +9,8 @@ app works without it. It brings:
 - **A stable API** for the stages and pending inputs of Pipeline builds, computed from the flow graph: the same
   whatever display plugins (Stage View, Graph View) are installed.
 
-Baseline: Jenkins 2.580.1, Java 21. No required plugin dependency: the Pipeline features need `workflow-job` (and
-`pipeline-input-step` for inputs), and are off without them.
+No required plugin dependency: the Pipeline features need `workflow-job` (and `pipeline-input-step` for inputs), and
+are off without them.
 
 ## How push works
 
@@ -58,8 +58,6 @@ mvn hpi:run         # local Jenkins on http://localhost:8080/jenkins/ with the p
 ```
 
 Requires Java 21 or later and Maven 3.9 or later.
-
-Install by hand: *Manage Jenkins › Plugins › Advanced settings › Deploy Plugin*, with `target/bouteiller.hpi`.
 
 ## Contributing
 

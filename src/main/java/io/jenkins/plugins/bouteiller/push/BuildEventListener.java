@@ -27,11 +27,17 @@ public final class BuildEventListener extends RunListener<Run<?, ?>> {
 
     @Override
     public void onStarted(Run<?, ?> run, TaskListener listener) {
+        if (isSubBuild(run)) {
+            return;
+        }
         publish(run, EventType.STARTED);
     }
 
     @Override
     public void onCompleted(Run<?, ?> run, @NonNull TaskListener listener) {
+        if (isSubBuild(run)) {
+            return;
+        }
         EventType type = completionType(run.getResult(), previousResult(run));
         if (type != null) {
             publish(run, type);
@@ -66,6 +72,16 @@ public final class BuildEventListener extends RunListener<Run<?, ?>> {
                 culprit(run),
                 buildUrl(run),
                 occurredAt);
+    }
+
+    /**
+     * Whether the build is part of the build of another job: a module of a Maven project, a configuration of a
+     * multi-configuration project. Their job lies inside the other job, so a subscription to it covers them too, and
+     * the device would be notified twice for one build; the build of the enclosing job alone is notified. Pipeline
+     * branches are not concerned: a multibranch project is a folder, not a job.
+     */
+    static boolean isSubBuild(Run<?, ?> run) {
+        return run.getParent().getParent() instanceof Job<?, ?>;
     }
 
     /** The event of a completed build, {@code null} for none ({@code NOT_BUILT}). */

@@ -5,6 +5,9 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNull;
 
+import hudson.matrix.AxisList;
+import hudson.matrix.MatrixProject;
+import hudson.matrix.TextAxis;
 import hudson.model.FreeStyleProject;
 import hudson.model.Item;
 import hudson.model.Result;
@@ -121,6 +124,23 @@ class BuildNotificationTest {
         Thread.sleep(300);
         assertEquals("cd".repeat(32), relay.received().get(4).request().deviceToken());
         assertEquals(5, relay.received().size());
+    }
+
+    @Test
+    void notifiesTheBuildOfTheProjectAloneNotTheBuildsOfItsParts() throws Exception {
+        j.jenkins.setAuthorizationStrategy(new MockAuthorizationStrategy()
+                .grant(Jenkins.READ, Item.READ).everywhere().to("alice"));
+        // Like the modules of a Maven project, the configurations are jobs inside the project, with their own builds.
+        MatrixProject project = j.createProject(MatrixProject.class, "matrix");
+        project.setAxes(new AxisList(new TextAxis("jdk", "21", "25")));
+        register("alice", "ab".repeat(32), "[{\"job\":\"matrix\",\"events\":[\"started\",\"succeeded\"]}]");
+        j.buildAndAssertSuccess(project);
+        relay.await(2);
+        Thread.sleep(500);
+        assertEquals(
+                List.of("started", "succeeded"),
+                relay.received().stream().map(FakeRelay.Received::eventType).toList());
+        assertEquals("matrix", relay.received().get(1).event().get("jobFullName"));
     }
 
     @Test
